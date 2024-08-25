@@ -13,5 +13,5 @@ default auth := false
 # }
 
 auth if {
-    input.is_admin == true
+    input.Is_Admin
 }

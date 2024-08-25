@@ -41,23 +41,24 @@ func main() {
 }
 
 func auth(c *fiber.Ctx) error {
-	// 	j := `{
-	//   "is_admin": true,
-	//   "username": "john_doe",
-	//   "uid": 12345
-	// }`
 
-	j := struct {
-		IsAdmin  bool
-		Username string
-		UID      int
+	// input := map[string]any{
+	// 	"Is_Admin": true,
+	// 	"Username": "Alan",
+	// 	"UID":      12345,
+	// }
+
+	user := struct {
+		IsAdmin  bool   `json:"Is_Admin"`
+		Username string `json:"username"`
+		UID      int    `json:"uid"`
 	}{
 		IsAdmin:  true,
-		Username: "Taurus",
+		Username: "john_doe",
 		UID:      12345,
 	}
 
-	err := opaPolicyEvaluation(c.UserContext(), regoAuthentication, RuleAuthenticate, j)
+	err := opaPolicyEvaluation(c.UserContext(), regoAuthentication, RuleAuthenticate, user)
 	if err != nil {
 		c.SendString("jwt not valid")
 		return err
