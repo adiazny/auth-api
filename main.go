@@ -10,7 +10,7 @@ import (
 	"github.com/open-policy-agent/opa/rego"
 )
 
-// These the current set of rules we have for auth.
+// Set of rules for auth.
 const (
 	RuleAuthenticate = "auth"
 )
@@ -20,7 +20,7 @@ const (
 	opaPackage string = "diaz.rego"
 )
 
-// Core OPA policies.
+// Core OPA policy files.
 var (
 	//go:embed authentication.rego
 	regoAuthentication string
@@ -42,36 +42,32 @@ func main() {
 
 func auth(c *fiber.Ctx) error {
 
-	// input := map[string]any{
-	// 	"Is_Admin": true,
-	// 	"Username": "Alan",
-	// 	"UID":      12345,
-	// }
-
-	user := struct {
-		IsAdmin  bool   `json:"Is_Admin"`
-		Username string `json:"username"`
-		UID      int    `json:"uid"`
-	}{
-		IsAdmin:  true,
-		Username: "john_doe",
-		UID:      12345,
+	input := map[string]any{
+		"Is_Admin": true,
+		"Username": "Alan",
+		"UID":      12345,
 	}
 
-	err := opaPolicyEvaluation(c.UserContext(), regoAuthentication, RuleAuthenticate, user)
+	// user := struct {
+	// 	IsAdmin  bool   `json:"Is_Admin"`
+	// 	Username string `json:"username"`
+	// 	UID      int    `json:"uid"`
+	// }{
+	// 	IsAdmin:  true,
+	// 	Username: "john_doe",
+	// 	UID:      12345,
+	// }
+
+	err := opaPolicyEvaluation(c.UserContext(), regoAuthentication, RuleAuthenticate, input)
 	if err != nil {
 		c.SendString("jwt not valid")
 		return err
 	}
 
-	c.SendString("Auth-API")
+	c.SendString("jwt is valid")
 
 	return nil
 }
-
-// rego policy
-// go rego code to evaluate input against policy
-// return valid or invalid
 
 func opaPolicyEvaluation(ctx context.Context, regoScript string, rule string, input any) error {
 	query := fmt.Sprintf("x = data.%s.%s", opaPackage, rule)
